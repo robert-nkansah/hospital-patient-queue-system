@@ -1,0 +1,549 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital Patient Queue Management System</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f1f5f9;
+            color: #1e293b;
+        }
+
+        header {
+            background: #087f8c;
+            color: white;
+            padding: 25px 6%;
+        }
+
+        header h1 {
+            margin-bottom: 8px;
+            font-size: 27px;
+        }
+
+        header p {
+            font-size: 14px;
+            opacity: 0.95;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .student {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 22px;
+            border-left: 5px solid #087f8c;
+            line-height: 1.8;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 22px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 22px;
+            border-radius: 12px;
+            box-shadow: 0 3px 10px #00000008;
+        }
+
+        .stat-card p {
+            color: #64748b;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+
+        .stat-card h2 {
+            font-size: 30px;
+            color: #087f8c;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.4fr;
+            gap: 22px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 3px 10px #00000008;
+        }
+
+        .card h2 {
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+
+        label {
+            display: block;
+            margin: 15px 0 8px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 7px;
+            font-size: 15px;
+            background: white;
+        }
+
+        button {
+            border: none;
+            padding: 12px 16px;
+            border-radius: 7px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            transition: 0.2s;
+        }
+
+        button:hover {
+            opacity: 0.85;
+        }
+
+        .primary {
+            background: #087f8c;
+            color: white;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .secondary {
+            background: #e0f2fe;
+            color: #075985;
+        }
+
+        .success {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .danger {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .current-patient {
+            background: #ecfeff;
+            border: 1px solid #a5f3fc;
+            border-radius: 10px;
+            padding: 18px;
+            margin-bottom: 22px;
+        }
+
+        .current-patient p {
+            color: #475569;
+            margin-bottom: 8px;
+        }
+
+        .current-patient h3 {
+            font-size: 25px;
+            color: #087f8c;
+            margin-bottom: 8px;
+        }
+
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 420px;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 13px 10px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 13px;
+        }
+
+        th {
+            background: #f8fafc;
+            color: #64748b;
+        }
+
+        .badge {
+            background: #fef3c7;
+            color: #92400e;
+            padding: 5px 8px;
+            border-radius: 20px;
+            font-size: 11px;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 25px 10px;
+            color: #64748b;
+        }
+
+        footer {
+            text-align: center;
+            padding: 25px;
+            margin-top: 25px;
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        @media (max-width: 750px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            header h1 {
+                font-size: 22px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>Hospital Patient Queue Management System</h1>
+    <p>A simple digital system for organizing patients waiting for hospital services.</p>
+</header>
+
+<div class="container">
+
+    <section class="student">
+        <strong>Student:</strong> Robert Eghan<br>
+        <strong>Index Number:</strong> PS/ITC/24/0255<br>
+        <strong>Data Structure:</strong> Queue (FIFO)
+    </section>
+
+    <section class="stats">
+        <div class="stat-card">
+            <p>Patients Waiting</p>
+            <h2 id="waitingCount">0</h2>
+        </div>
+
+        <div class="stat-card">
+            <p>Currently Being Served</p>
+            <h2 id="currentNumber">None</h2>
+        </div>
+
+        <div class="stat-card">
+            <p>Patients Completed</p>
+            <h2 id="completedCount">0</h2>
+        </div>
+    </section>
+
+    <section class="main-grid">
+
+        <div class="card">
+            <h2>Register a Patient</h2>
+
+            <form id="patientForm">
+                <label for="patientName">Patient Name</label>
+                <input
+                    type="text"
+                    id="patientName"
+                    placeholder="Enter patient's name"
+                    maxlength="60"
+                    required
+                >
+
+                <label for="department">Select Department</label>
+                <select id="department" required>
+                    <option value="">Choose a department</option>
+                    <option value="General Consultation">General Consultation</option>
+                    <option value="Laboratory">Laboratory</option>
+                    <option value="Pharmacy">Pharmacy</option>
+                    <option value="Dental Clinic">Dental Clinic</option>
+                    <option value="Eye Clinic">Eye Clinic</option>
+                </select>
+
+                <button type="submit" class="primary">
+                    Add Patient to Queue
+                </button>
+            </form>
+        </div>
+
+        <div class="card">
+            <h2>Patient Service Desk</h2>
+
+            <div class="current-patient">
+                <p>Currently Serving</p>
+                <h3 id="currentPatientName">No patient selected</h3>
+                <p id="currentPatientDetails">
+                    Call the next patient to begin.
+                </p>
+
+                <div class="actions">
+                    <button class="secondary" id="nextButton">
+                        Call Next Patient
+                    </button>
+
+                    <button class="success" id="completeButton">
+                        Complete Service
+                    </button>
+                </div>
+            </div>
+
+            <p id="message" role="status" aria-live="polite">
+                Welcome to the hospital queue system.
+            </p>
+        </div>
+
+    </section>
+
+    <section class="card" style="margin-top: 22px;">
+        <h2>Patients Waiting in Queue</h2>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Queue Number</th>
+                        <th>Patient Name</th>
+                        <th>Department</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+
+                <tbody id="queueTable"></tbody>
+            </table>
+        </div>
+    </section>
+
+</div>
+
+<footer>
+    Hospital Patient Queue Management System | Educational Project
+</footer>
+
+<script>
+    const STORAGE_KEY = "hospitalQueueProject_v1";
+
+    function loadData() {
+        try {
+            const saved = localStorage.getItem(STORAGE_KEY);
+
+            if (saved) {
+                const data = JSON.parse(saved);
+
+                if (
+                    Array.isArray(data.queue) &&
+                    Array.isArray(data.completed) &&
+                    Number.isInteger(data.nextNumber)
+                ) {
+                    return data;
+                }
+            }
+        } catch (error) {
+            console.error("Could not load saved queue data.", error);
+        }
+
+        return {
+            queue: [],
+            current: null,
+            completed: [],
+            nextNumber: 1
+        };
+    }
+
+    let data = loadData();
+
+    function saveData() {
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        } catch (error) {
+            showMessage("Unable to save data in this browser.");
+        }
+    }
+
+    function showMessage(message) {
+        document.getElementById("message").textContent = message;
+    }
+
+    function render() {
+        document.getElementById("waitingCount").textContent =
+            data.queue.length;
+
+        document.getElementById("currentNumber").textContent =
+            data.current ? data.current.number : "None";
+
+        document.getElementById("completedCount").textContent =
+            data.completed.length;
+
+        document.getElementById("currentPatientName").textContent =
+            data.current ? data.current.name : "No patient selected";
+
+        document.getElementById("currentPatientDetails").textContent =
+            data.current
+                ? data.current.number + " | " + data.current.department
+                : "Call the next patient to begin.";
+
+        const table = document.getElementById("queueTable");
+        table.replaceChildren();
+
+        if (data.queue.length === 0) {
+            const row = document.createElement("tr");
+            const cell = document.createElement("td");
+
+            cell.colSpan = 4;
+            cell.className = "empty";
+            cell.textContent = "No patients are waiting.";
+
+            row.appendChild(cell);
+            table.appendChild(row);
+            return;
+        }
+
+        data.queue.forEach(function(patient) {
+            const row = document.createElement("tr");
+
+            [
+                patient.number,
+                patient.name,
+                patient.department
+            ].forEach(function(value) {
+                const cell = document.createElement("td");
+                cell.textContent = value;
+                row.appendChild(cell);
+            });
+
+            const statusCell = document.createElement("td");
+            const badge = document.createElement("span");
+
+            badge.className = "badge";
+            badge.textContent = "Waiting";
+
+            statusCell.appendChild(badge);
+            row.appendChild(statusCell);
+            table.appendChild(row);
+        });
+    }
+
+    document.getElementById("patientForm").addEventListener(
+        "submit",
+        function(event) {
+            event.preventDefault();
+
+            const name = document.getElementById("patientName")
+                .value.trim();
+
+            const department = document.getElementById("department")
+                .value;
+
+            if (!name || !department) {
+                showMessage("Please enter the patient's name and department.");
+                return;
+            }
+
+            const number = "H" +
+                String(data.nextNumber).padStart(3, "0");
+
+            const patient = {
+                number: number,
+                name: name,
+                department: department
+            };
+
+            data.queue.push(patient);
+            data.nextNumber++;
+
+            saveData();
+            render();
+
+            document.getElementById("patientForm").reset();
+
+            showMessage(
+                name + " has joined the queue. Queue number: " + number
+            );
+        }
+    );
+
+    document.getElementById("nextButton").addEventListener(
+        "click",
+        function() {
+            if (data.current) {
+                showMessage(
+                    "Complete the current patient's service before calling another."
+                );
+                return;
+            }
+
+            if (data.queue.length === 0) {
+                showMessage("There are no patients waiting.");
+                return;
+            }
+
+            // DEQUEUE: remove the patient at the front of the queue.
+            data.current = data.queue.shift();
+
+            saveData();
+            render();
+
+            showMessage(
+                "Now serving " + data.current.name +
+                " (" + data.current.number + ")."
+            );
+        }
+    );
+
+    document.getElementById("completeButton").addEventListener(
+        "click",
+        function() {
+            if (!data.current) {
+                showMessage("There is no active patient to complete.");
+                return;
+            }
+
+            data.completed.push(data.current);
+
+            const name = data.current.name;
+            const number = data.current.number;
+
+            data.current = null;
+
+            saveData();
+            render();
+
+            showMessage(
+                "Service completed for " + name + " (" + number + ")."
+            );
+        }
+    );
+
+    render();
+</script>
+
+</body>
+</html>
+```
